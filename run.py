@@ -1,6 +1,5 @@
 import gspread
 from google.oauth2.service_account import Credentials
-from pprint import pprint
 
 
 SCOPE = [
@@ -112,7 +111,24 @@ def update_worksheet(data, worksheet):
     print(f"{worksheet} worksheet updated successfully.\n")
 
 
+def get_stock_values(data):
+    """
+    Collects headings of data from stock worksheet.
+    """
+    headings = SHEET.worksheet("stock").row_values(1)
+
+    results = {}
+    {h: results.update({h: d}) for (h, d) in zip(headings, data)}
+    #for h, d in zip(headings, data):
+    #    results.update({h: d})
+
+    return results
+
+
 def main():
+    """
+    Run all program functions
+    """
     data = get_sales_data()
     sales_data = [int(num) for num in data]
     update_worksheet(sales_data, "sales")
@@ -121,8 +137,12 @@ def main():
     sales_columns = get_last_5_entries_sales()
     stock_data = calculate_stock_data(sales_columns)
     update_worksheet(stock_data, "stock")
+    stock_values = get_stock_values(stock_data)
+    return stock_values
 
 
-print("Welcome to Love Sandwiches data automation")
-main()
+print("Welcome to Love Sandwiches data automation.\n")
 
+stock_values = main()
+
+print(stock_values)
